@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BookingGatewayService.Exceptions
 {
-    public class ReadOperationInProgressException : Exception
+    public sealed class ReadOperationInProgressException : Exception
     {
     }
 }

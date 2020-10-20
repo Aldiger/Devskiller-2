@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BookingGatewayService.Exceptions
 {
-    public class NoStartBookingException : Exception
+    public sealed class NoStartBookingException : Exception
     {
     }
 }
