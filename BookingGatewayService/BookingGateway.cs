@@ -8,13 +8,14 @@ using BookingGatewayService.Exceptions;
 
 namespace BookingGatewayService
 {
-    public class BookingGateway : IBookingGateway
+    public sealed class BookingGateway : IBookingGateway
     {
         public BookingGateway(IDBRepository dbRepository)
         {
             DBRepository = dbRepository;
         }
 
+        private static int _current;
         private static volatile object _locker = new object();
         public IDBRepository DBRepository { get; set; }
 
@@ -22,6 +23,7 @@ namespace BookingGatewayService
         {
             if (Monitor.IsEntered(_locker) || !Monitor.TryEnter(_locker))
                 throw new BookingInProgressException();
+            _current = Environment.CurrentManagedThreadId;
         }
 
         public void EndBooking()
@@ -55,8 +57,8 @@ namespace BookingGatewayService
 
         public IList<TransactionStatus> GetBookingStatuses(IList<string> uniqueTransactionRefs)
         {
-            //if (Monitor.IsEntered(_locker))
-            //    throw new BookingInProgressException();
+            if (_current != Environment.CurrentManagedThreadId && Monitor.IsEntered(_locker))
+                throw new BookingInProgressException();
 
             if (uniqueTransactionRefs == null || !uniqueTransactionRefs.Any())
             {
